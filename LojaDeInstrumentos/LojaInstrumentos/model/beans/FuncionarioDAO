@@ -1,0 +1,63 @@
+package trampofinal;
+
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+
+public class FuncionarioDAO {
+
+	
+	public static void inserirFuncionario(Funcionario fu){
+		
+			Connection con = ConnectionFactory.getConnection();
+			PreparedStatement stmt = null;
+			
+			try {
+				stmt = con.prepareStatement("INSERT INTO Funcionario(nome,RG,sal,senha) VALUES (?,?)");
+				stmt.setString(1,fu.getNome());
+				stmt.setInt(2,fu.getRG());
+				stmt.setDouble(3,fu.getSalario());
+				
+				stmt.executeUpdate();
+				
+				JOptionPane.showMessageDialog(null, "Salvo com sucesso!");
+				
+			} catch (SQLException e) {
+				JOptionPane.showMessageDialog(null, "Erro ao salvar: "+e);
+			} finally {
+				ConnectionFactory.closeConnection(con, stmt);
+			}
+		}
+		
+		public List<Funcionario> read(){
+			Connection con = new ConnectionFactory().getConnection();
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			List<Funcionario> funcionarios = new <Funcionario> ArrayList();
+			try {
+				stmt = con.prepareStatement("SELECT * FROM Funcionario");
+				rs = stmt.executeQuery();
+				
+				while(rs.next()) {
+					
+					Funcionario funcionario = new Funcionario(rs.getString("nome"),rs.getInt("RG"),rs.getDouble("salario"));
+					
+					funcionarios.add(funcionario);
+				}
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} finally {
+				ConnectionFactory.closeConnection(con, stmt, rs);
+			}
+			
+			
+			return funcionarios;
+		}
+}
